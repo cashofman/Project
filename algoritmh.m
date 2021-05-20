@@ -76,7 +76,7 @@ priority = E1.*Cp.*abs(F2/alpha.*((cos(theta2).*cos(theta1)+sin(theta2).*sin(the
 %dipshow(E1,'base')
 %dipshow(E2,'angle')
 %% first iteration
-n = 11;
+n = 7;
 n1 = floor(n/2);
 alpha = 255;
 
