@@ -29,7 +29,7 @@ hFH = imfreehand(); % Actual line of code to do the drawing.
 binaryImage = hFH.createMask();
 xy = hFH.getPosition;
 
-
+close 
 %% deleting area
 % P1 = [180*3/4, 138*3/4];
 % P2 = [180*3/4, 360*3/4];

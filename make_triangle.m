@@ -8,9 +8,9 @@ y = [a, -b, -b, a, -b];
 x2 = [-c, c, 0];
 y2 = [b, b, -a];
 
-plot(x,y,'k','LineWidth',3)
+plot(x,y,'k','LineWidth',15)
 hold on
-plot(x2, y2, '.k', 'MarkerSize',200)
+plot(x2, y2, '.k', 'MarkerSize',250)
 set(gca,'Color','white','xticklabel',[],'yticklabel',[])%setting background black and removing labels
 xlim([-lim lim])
 ylim([-lim lim])
