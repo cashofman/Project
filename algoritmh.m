@@ -1,20 +1,16 @@
-%% initialise dip
-addpath('/Users/cashofman/Desktop/Master/ADIP/dip/common/dipimage')
-dip_initialise
-addpath '/Users/cashofman/Desktop/Master/ADIP/dip/common/dipimage'
 %% start
 clear all
 close all
 clc
 %% load image
-I = imread('/Users/cashofman/Desktop/Master/ADIP/Project/mountaineer.jpg');
+I = imread('./mountaineer.jpg');
 %I = double(I);
 I = rgb2gray(I);
 %I = I(100:end-50,1:end-80);
 s=6;
 I = I(1:s:end,1:s:end,:);
 I = double(I);
-dipshow(I);
+imshow(I,gray);
 
 [col1, row1] = size(I);
 %% selecting area
@@ -57,7 +53,7 @@ for j=1:row1
 end 
 
 
-dipshow(J2)
+imshow(J2)
 im = J2;
 iter = 0;
 %%
@@ -68,7 +64,6 @@ n1 = floor(n/2);
 alpha = 255;
 E1 = edge2(F);
 
-%for m = 1:20
 while sum(sum(1-F))>1
     iter = iter+1;
     E = edge2(F);
@@ -141,15 +136,16 @@ end
 sum(sum(1-F))
 close all   
 E = E0 + E1 + edge2(F);
-%dipshow(E,'base')
-dipshow(mat2im(im))
-dipshow(E,'base')
-dipshow(priority,'base')
+figure()
+imshow(im,gray)
+figure()
+imshow(E*255,gray)
+figure()
+imshow(priority*255,gray)
 %%
 E = edge2(F);
-dipshow(F2,'base')
+imshow(F2);
 sum(sum(priority))
-
 
 %% Functions
 function kernel = phi(Im, y, x, n)
@@ -212,3 +208,4 @@ function result = edge2(f)
     result(1,:) = NaN; result(:,1) = NaN; result(end,:) = NaN; result(:,end) = NaN;
     result(isnan(result))=0;
 end
+
