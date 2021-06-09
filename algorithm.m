@@ -3,11 +3,11 @@ clear all
 close all
 clc
 %% load image
-I = imread('./waterfal.jpg');
+I = imread('./apples.tiff');
 %I = double(I);
 I = rgb2gray(I);
 %I = I(100:end-50,1:end-80);
-s=2;
+s=1;
 I = I(1:s:end,1:s:end,:);
 I = double(I);
 imshow(I,gray);
@@ -30,9 +30,9 @@ xy = hFH.getPosition;
 
 
 %% deleting area
-P1 = [112/s, 50/s];
-P2 = [112/s, 420/s];
-P3 = [442/s, 234/s];
+P1 = [122/s, 50/s];
+P2 = [122/s, 420/s];
+P3 = [435/s, 234/s];
 s = det([P1-P2;P3-P1]);
 J2 = I;
 C = ones(col1, row1); % Confidence term
@@ -42,14 +42,13 @@ F = ones(col1, row1); % Filled term
 for j=1:row1
     for i=1:col1
         P = [i,j];
-%         if J2(i,j)<127
-%             J2(i,j) = 1;
-%         end
-%         if J2(i,j)>126
-%             J2(i,j) = 255;
-%         end
-        if binaryImage(i,j) == 1
-            %s*det([P3-P;P2-P3])>=0 && s*det([P1-P;P3-P1])>=0 && s*det([P2-P;P1-P2])>=0
+        if J2(i,j)<127
+            J2(i,j) = 0;
+        else
+            J2(i,j) = 255;
+        end
+         
+        if s*det([P3-P;P2-P3])>=0 && s*det([P1-P;P3-P1])>=0 && s*det([P2-P;P1-P2])>=0
             %s*det([P3-P;P2-P3])>=0 && s*det([P1-P;P3-P1])>=0 && s*det([P2-P;P1-P2])>=0
             %binaryImage(i,j) == 1
             J2(i,j) = NaN;
@@ -63,50 +62,16 @@ figure
 imshow(J2,gray)
 im = J2;
 iter = 0;
-%%
-n = 15;
-n1 = floor(n/2);
-alpha = 255;
-
-E = edge2(F);
-E2 = edge(F)-E;
-dx = [[1, 0, -1];[1, 0, -1];[1, 0, -1]];
-dy = [[1, 1, 1];[0, 0, 0];[-1, -1, -1]];
-Fx1 = conv2(dx, E2);
-Fy1 = conv2(dy, E2);
-Fx1 = Fx1(2:col1+1,2:row1+1);
-Fy1 = Fy1(2:col1+1,2:row1+1);
 
 
-[Fx, Fy] = gradient(E);
-[Ix, Iy] = gradient(im);
-Ix = Ix / alpha; Iy = Iy / alpha;
-Gx = Fy1.*Ix; Gy = Fx1.*Iy;
-Gx(isnan(Gx))=0; Gy(isnan(Gy))=0;
-
-F1 = sqrt(Fx.^2 + Fy.^2);
-I1 = sqrt(Ix.^2 + Iy.^2);
-
-Cp = confidence(C, n);
-Dp = sqrt(Gx.^2 + Gy.^2);%F2.*abs(cos(theta2).*cos(theta1)+sin(theta2).*sin(theta1));
-Dp(isnan(Dp))=0;
-priority = Cp.*Dp;
-
-
-figure
-imshow(Fy1*255)
-%%
-im_start = im;
-C_start = C;
-F_start = F;
 %% first iteration
 E0 = edge2(F);
-n = 15;
+n = 11;
 n1 = floor(n/2);
 alpha = 255;
 E1 = edge2(F);
 priority =1;
-for i = 1:50
+for i = 1:100
     i
 %while sum(sum(1-F))>1
 %     iter = iter+1;
@@ -139,7 +104,7 @@ for i = 1:50
     priority = Cp.*Dp;
     
     if sum(sum(priority)) == 0
-        priority = E2.*Cp;
+        priority = E2;
         
         [y1, x1] = find(priority==max(max(priority)));
         res = randperm(length(y1),1);
@@ -169,8 +134,8 @@ for i = 1:50
             if all(all(phi(F, i, j, n)==1))
                 phi_q = phi(im, i, j, n); 
                 q_arr = phi_q(indices);
-                err = sum((q_arr-p_arr).^2);
-                if err < err_start %&& (i-13)^2+(j-118)^2 > (n+1)^2 && (i-160)^2+(j-35)^2 > (n+1)^2 && (i-160)^2+(j-201)^2 > (n+1)^2
+                err = sum((q_arr-p_arr).^2,'all');
+                if err < err_start && (i-25)^2+(j-235)^2 > (n+2)^2 && (i-322)^2+(j-64)^2 > (n+2)^2 && (i-322)^2+(j-405)^2 > (n+2)^2 && (i-y)^2+(j-x)^2 > n^2
                     % up 25,235, left 322, 64 right 322,405
                     err_start = err;
                     y2 = i;
@@ -187,7 +152,7 @@ for i = 1:50
     idy = find(dist==min(min(dist)));
     idy = idy(1);
     
-    idy = randperm(length(y2),1);
+    %idy = randperm(length(y2),1);
     x1 = x2(idy);
     y1 = y2(idy);
     phi_q = phi(im, y1, x1, n); %im(y1-n1:y1+n1,x1-n1:x1+n1);
@@ -211,9 +176,19 @@ imshow(priority*255)
 figure
 imshow(im,gray)
 %%
-figure
-imshow(im,gray)
+R = im;
+G = im;
 
+R(isnan(R)) = 255;
+G(isnan(R)) = 0;
+B = G;
+
+Im(:,:,1) = R;
+Im(:,:,2) = G;
+Im(:,:,3) = B;
+
+Im = uint8(Im);
+imshow(Im)
 %% Functions
 function kernel = phi(Im, y, x, n)
     n1 = floor(n/2);
@@ -283,6 +258,6 @@ function result = edge(f)
     edge2 = edge2 ~=9;
     result = edge2.*f;
     result = result./result;
-    result(1,:) = NaN; result(:,1) = NaN; result(end,:) = NaN; result(:,end) = NaN;
+    result(1:3,:) = NaN; result(:,1:3) = NaN; result(end-2:end,:) = NaN; result(:,end-2:end) = NaN;
     result(isnan(result))=0;
 end

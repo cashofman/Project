@@ -3,7 +3,7 @@ clear all
 close all
 clc
 %% load image
-I = imread('./waterval.jpeg');
+I = imread('./apples.tiff');
 s=1;
 I = I(1:s:end,1:s:end,1:3);
 DI = double(I);
@@ -45,7 +45,7 @@ im = J2;
 %% first iteration
 %im = double(im);
 E0 = edge2(F);
-n = 9;
+n = 19;
 n1 = floor(n/2);
 alpha = 255;
 E1 = edge2(F);
@@ -78,7 +78,7 @@ while sum(sum(1-F))>1
 
     Cp = confidence(C, n);
     Dp = sqrt(Gx.^2 + Gy.^2);
-    Dp(isnan(Dp))=0;??
+    Dp(isnan(Dp))=0;
     priority = Cp.*Dp;
     priority = sum(priority,3);
     
@@ -127,7 +127,7 @@ while sum(sum(1-F))>1
     idy = find(dist==min(min(dist)));
     idy = idy(1);
     
-    idy = randperm(length(y2),1);
+    %idy = randperm(length(y2),1);
     x1 = x2(idy);
     y1 = y2(idy);
     phi_q = phi(im, y1, x1, n); %im(y1-n1:y1+n1,x1-n1:x1+n1);
