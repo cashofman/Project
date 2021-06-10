@@ -3,7 +3,8 @@ clear all
 close all
 clc
 %% load image
-I = imread('./apples.tiff');
+
+I = imread('./crimsi_images/bungee.jpg');
 s=1;
 I = I(1:s:end,1:s:end,1:3);
 DI = double(I);
@@ -43,21 +44,13 @@ figure
 imshow(uint8(J2))
 im = J2;
 %% first iteration
-%im = double(im);
-E0 = edge2(F);
-n = 19;
+iter = 0
+n = 9;
 n1 = floor(n/2);
 alpha = 255;
-E1 = edge2(F);
 priority = 1;
-% for i = 1:50
-%     i
 while sum(sum(1-F))>1
-%     iter = iter+1;
-%     [F1, theta1] = isophote(E); % normal vector of the edge
-%     [F2, theta2] = isophote(im); % isophote of image
-%     theta1 = theta1 * -1; 
-%     F2 = F2/alpha;
+    iter = iter+1
 
     E = edge2(F);
     E2 = edge(F)-E;
@@ -68,13 +61,10 @@ while sum(sum(1-F))>1
     Fx1 = Fx1(2:col1+1,2:row1+1);
     Fy1 = Fy1(2:col1+1,2:row1+1);
     
-    [Fx, Fy] = gradient(E);
     [Ix, Iy] = gradient(double(im),100);
     Ix = Ix / alpha; Iy = Iy / alpha;
     Gx = Fy1.*Ix; Gy = Fx1.*Iy;
     Gx(isnan(Gx))=0; Gy(isnan(Gy))=0;
-
-    I1 = sqrt(Ix.^2 + Iy.^2);
 
     Cp = confidence(C, n);
     Dp = sqrt(Gx.^2 + Gy.^2);
@@ -127,7 +117,7 @@ while sum(sum(1-F))>1
     idy = find(dist==min(min(dist)));
     idy = idy(1);
     
-    %idy = randperm(length(y2),1);
+    idy = randperm(length(y2),1);
     x1 = x2(idy);
     y1 = y2(idy);
     phi_q = phi(im, y1, x1, n); %im(y1-n1:y1+n1,x1-n1:x1+n1);
@@ -138,16 +128,24 @@ while sum(sum(1-F))>1
     F(y-n1:y+n1,x-n1:x+n1) = 1;
     C(y-n1:y+n1,x-n1:x+n1) = Cp(y,x);
     sum(sum(1-F))
+    
+    if mod(iter,75) == 0
+        fig_name = strcat('./Results/bungee_n12_',num2str(n),'iter_',num2str(iter),'.tif');
+        R = im(:,:,1);
+        G = im(:,:,2);
+        B = im(:,:,3);
+        
+        R(isnan(R)) = 255;
+        G(isnan(G)) = 0;
+        B(isnan(B)) = 0;
+        
+        Im(:,:,1) = R;
+        Im(:,:,2) = G;
+        Im(:,:,3) = B;
+        imwrite(uint8(Im),fig_name)
+        imshow(uint8(Im))
+    end
 end
-sum(sum(1-F))
-close all   
-E = E0 + E1 + edge2(F);
-figure()
-imshow(uint8(im))
-figure()
-imshow(E*255,gray)
-figure()
-imshow(priority*255)
 %%
 figure
 imshow(uint8(im))
